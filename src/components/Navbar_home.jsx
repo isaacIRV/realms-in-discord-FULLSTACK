@@ -1,14 +1,16 @@
 import React from 'react';
+import './Navbar_style.css'; 
 
 const Navbar = () => {
   return (
-    <nav style={{ background: '#222', padding: '10px' }}>
-      <ul style={{ display: 'flex', listStyle: 'none', margin: 0, padding: 0 }}>
-        <li style={{ marginRight: '20px', color: '#ffffffff', cursor: 'pointer' }}>Play</li>
-        <li style={{ marginRight: '20px', color: '#ffffffff', cursor: 'pointer' }}>Mazo</li>
-        <li style={{ color: '#ffffffff', cursor: 'pointer' }}>Biblioteca</li>
+    <nav className="navbar">
+      <ul className="navbar-list">
+        <li className="navbar-item">Play</li>
+        <li className="navbar-item">Mazo</li>
+        <li className="navbar-item">Biblioteca</li>
       </ul>
     </nav>
   );
 };
+
 export default Navbar;
