@@ -1,5 +1,5 @@
 .navbar {
-  background: rgba(34, 34, 34, 0.85);
+  background: rgba(34, 34, 34, 0.308);
   padding: 10px;
 }
 .navbar-list {
@@ -15,5 +15,6 @@
   transition: color 0.2s;
 }
 .navbar-item:hover {
-  color: #00bfff;
+  color: #f5de0d;
 }
+
