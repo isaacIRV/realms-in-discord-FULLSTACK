@@ -1,20 +1,32 @@
 .navbar {
   background: rgba(34, 34, 34, 0.733);
   padding: 10px;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
+
 .navbar-list {
   display: flex;
   list-style: none;
   margin: 0;
   padding: 0;
 }
+
 .navbar-item {
   margin-right: 20px;
   color: #fff;
   cursor: pointer;
   transition: color 0.2s;
 }
+
 .navbar-item:hover {
   color: #f5de0d;
 }
 
+/* Elimina márgenes por defecto del body */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}

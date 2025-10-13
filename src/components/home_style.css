@@ -1,6 +1,9 @@
 body {
   margin: 0;
-  height: 100%;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
   background-image: url('../background/home_background.png');
   background-size: cover;
   background-position: center;
