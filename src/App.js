@@ -1,44 +1,13 @@
-<<<<<<< Updated upstream
+
 import React from 'react';
-=======
 import './App.css';
 import React, { useState, useEffect} from 'react';
 import { BrowserRouter,Routes,Route,Navigate } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
-import RegisterPage from './components/RegisterPage';
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 import Home from './components/home';
 import './index.css';
 
 function App() {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  return (
-    <Home />
-  );
-}
-
-export default App;
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-  // Guarda el usuario actual
-   const [currentUser, setCurrentUser] = useState(localStorage.getItem('currentUser'));
   // Verifica si el usuario esta logueado
    const [isLoggedIn, setIsLoggedIn] = useState(!!currentUser);
 
@@ -103,4 +72,4 @@ export default App;
 }
 
 export default App;
->>>>>>> Stashed changes
+
