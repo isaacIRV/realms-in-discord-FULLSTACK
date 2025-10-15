@@ -1,13 +1,14 @@
-
-import React from 'react';
 import './App.css';
 import React, { useState, useEffect} from 'react';
 import { BrowserRouter,Routes,Route,Navigate } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
+import RegisterPage from './components/RegisterPage';
 import Home from './components/home';
 import './index.css';
 
 function App() {
+  // Guarda el usuario actual
+   const [currentUser, setCurrentUser] = useState(localStorage.getItem('currentUser'));
   // Verifica si el usuario esta logueado
    const [isLoggedIn, setIsLoggedIn] = useState(!!currentUser);
 
