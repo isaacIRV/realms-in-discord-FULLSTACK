@@ -13,10 +13,13 @@ import RegisterPage from './components/RegisterPage';
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 import Home from './components/home';
 import './index.css';
 
 function App() {
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -27,6 +30,8 @@ function App() {
 
 export default App;
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
