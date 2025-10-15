@@ -7,6 +7,9 @@ import { BrowserRouter,Routes,Route,Navigate } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -16,6 +19,7 @@ import './index.css';
 function App() {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   return (
     <Home />
   );
@@ -23,6 +27,8 @@ function App() {
 
 export default App;
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
   // Guarda el usuario actual
