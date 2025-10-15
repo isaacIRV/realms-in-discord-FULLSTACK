@@ -6,11 +6,15 @@ import React, { useState, useEffect} from 'react';
 import { BrowserRouter,Routes,Route,Navigate } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 import Home from './components/home';
 import './index.css';
 
 function App() {
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
   return (
     <Home />
@@ -19,6 +23,8 @@ function App() {
 
 export default App;
 =======
+=======
+>>>>>>> Stashed changes
   // Guarda el usuario actual
    const [currentUser, setCurrentUser] = useState(localStorage.getItem('currentUser'));
   // Verifica si el usuario esta logueado
