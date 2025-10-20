@@ -3,7 +3,7 @@ import Navbar from './Navbar_home';
 import background from '../background/home_background.png';
 import '../styles/home_style.css';
 
-const Home = ({currentUser, onLogout}) => {
+const Home = ({currentUser, onLogout, onUsernameChange}) => {
   return (
     <div className='home-container' style={{
       margin: 0,
@@ -11,7 +11,11 @@ const Home = ({currentUser, onLogout}) => {
       minHeight: '100vh',
       width: '100vw'
     }}>
-      <Navbar currentUser={currentUser} onLogout={onLogout}/>
+      <Navbar 
+        currentUser={currentUser} 
+        onLogout={onLogout}
+        onUsernameChange={onUsernameChange} // ← Agregar esta prop
+      />
       
       {/* Contenido principal con la imagen de fondo */}
       <div style={{
