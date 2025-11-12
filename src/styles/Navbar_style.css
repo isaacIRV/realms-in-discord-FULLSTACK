@@ -132,10 +132,38 @@
   text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
 }
 
+/* Estilos para el display de oro en el navbar */
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
 .user-greeting {
   color: #ffffff;
   font-size: 14px;
   font-weight: 600;
+}
+
+.gold-display {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(245, 222, 13, 0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(245, 222, 13, 0.3);
+}
+
+.gold-icon {
+  font-size: 0.9em;
+}
+
+.gold-amount {
+  color: #f5de0d;
+  font-size: 0.85em;
+  font-weight: bold;
 }
 
 .dropdown-arrow {
@@ -147,6 +175,24 @@
 .user-menu-btn:hover .dropdown-arrow {
   transform: rotate(180deg);
   color: #f5de0d;
+}
+
+/* Display de oro en el modal */
+.user-gold-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(245, 222, 13, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(245, 222, 13, 0.3);
+  margin: 10px 0;
+}
+
+.gold-amount-large {
+  color: #f5de0d;
+  font-size: 1.1em;
+  font-weight: bold;
 }
 
 /* ===== ESTILOS DEL MODAL ===== */
@@ -742,6 +788,10 @@
   
   .user-menu-btn {
     padding: 6px 12px;
+  }
+  
+  .user-info {
+    display: none;
   }
   
   .user-greeting {

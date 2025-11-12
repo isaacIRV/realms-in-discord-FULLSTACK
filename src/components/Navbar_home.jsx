@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/Navbar_style.css'; 
 
-const Navbar = ({currentUser, onLogout, onUsernameChange}) => {
+const Navbar = ({currentUser, onLogout, onUsernameChange, gold = 0, onGoldUpdate}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [newUsername, setNewUsername] = useState(currentUser || '');
@@ -176,7 +176,13 @@ const Navbar = ({currentUser, onLogout, onUsernameChange}) => {
                 {currentUser ? currentUser.charAt(0).toUpperCase() : 'U'}
               </span>
             </div>
-            <span className="user-greeting">Hola, {currentUser}</span>
+            <div className="user-info">
+              <span className="user-greeting">Hola, {currentUser}</span>
+              <div className="gold-display">
+                <span className="gold-icon">🪙</span>
+                <span className="gold-amount">{gold}</span>
+              </div>
+            </div>
             <span className="dropdown-arrow">▼</span>
           </button>
         </div>
@@ -251,6 +257,10 @@ const Navbar = ({currentUser, onLogout, onUsernameChange}) => {
                     ) : (
                       <>
                         <h3 className="modal-username">{currentUser}</h3>
+                        <div className="user-gold-display">
+                          <span className="gold-icon">🪙</span>
+                          <span className="gold-amount-large">{gold} Oro</span>
+                        </div>
                         <p className="user-level">Nivel 15</p>
                         <button 
                           className="edit-username-btn"
