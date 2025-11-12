@@ -36,6 +36,29 @@ const Deck = () => {
                card.name.toLowerCase().includes('héroe');
     };
 
+    // Calcular distribución de costes y promedio - VERSIÓN MEJORADA
+    const calculateCostStats = (deckCards) => {
+        const costDistribution = {
+            1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0
+        };
+        
+        let totalCost = 0;
+        let cardCount = 0;
+
+        deckCards.forEach(card => {
+            if (!isHeroCard(card)) { // Excluir el héroe del cálculo
+                const cost = Math.min(Math.max(1, card.cost), 8); // Agrupar costes >=8 en 8 y asegurar mínimo 1
+                costDistribution[cost] = (costDistribution[cost] || 0) + 1;
+                totalCost += card.cost;
+                cardCount++;
+            }
+        });
+
+        const averageCost = cardCount > 0 ? (totalCost / cardCount).toFixed(2) : '0.00';
+        
+        return { costDistribution, averageCost };
+    };
+
     // Agregar una carta al mazo
     const addCardToDeck = (card) => {
         if (isHeroCard(card)) {
@@ -97,7 +120,6 @@ const Deck = () => {
         const deckName = prompt('Ingresa un nombre para tu mazo:', `Mazo ${savedDecks.length + 1}`);
         if (!deckName) return;
 
-        // CORRECCIÓN: Usar el estado actual de savedDecks en lugar de redeclararlo
         const currentSavedDecks = JSON.parse(localStorage.getItem('savedDecks')) || [];
         const newDeck = {
             id: Date.now(),
@@ -112,7 +134,7 @@ const Deck = () => {
         
         alert('¡Mazo guardado exitosamente!');
         setError('');
-        loadSavedDecks(); // Recargar la lista de mazos
+        loadSavedDecks();
     };
 
     // Mostrar detalles de un mazo guardado
@@ -123,7 +145,7 @@ const Deck = () => {
 
     // Eliminar un mazo guardado
     const deleteDeck = (deckId, event) => {
-        event.stopPropagation(); // Evitar que se active el viewDeckDetails
+        event.stopPropagation();
         if (window.confirm('¿Estás seguro de que quieres eliminar este mazo?')) {
             const updatedDecks = savedDecks.filter(deck => deck.id !== deckId);
             localStorage.setItem('savedDecks', JSON.stringify(updatedDecks));
@@ -149,6 +171,44 @@ const Deck = () => {
     const closeModal = () => {
         setShowDeckModal(false);
         setSelectedDeck(null);
+    };
+
+    // Renderizar gráfico de costes - VERSIÓN COMPLETAMENTE CORREGIDA
+    const renderCostChart = (deckCards) => {
+        const { costDistribution, averageCost } = calculateCostStats(deckCards);
+        const maxCount = Math.max(...Object.values(costDistribution));
+        
+        // Altura máxima para las barras (en porcentaje)
+        const maxBarHeight = 100;
+        
+        return (
+            <div className="cost-chart">
+                <h4>Distribución de Costes</h4>
+                <p className="average-cost">Coste Promedio: <strong>{averageCost}</strong></p>
+                <div className="chart-bars">
+                    {Object.entries(costDistribution).map(([cost, count]) => {
+                        // Calcular altura basada en el conteo máximo
+                        const height = maxCount > 0 ? (count / maxCount) * maxBarHeight : 0;
+                        
+                        return (
+                            <div key={cost} className="chart-bar-container">
+                                <div className="chart-bar-label">{cost}{cost === '8' ? '+' : ''}</div>
+                                <div className="chart-bar">
+                                    <div 
+                                        className="chart-bar-fill"
+                                        style={{ 
+                                            height: `${height}%`,
+                                            minHeight: count > 0 ? '5px' : '0px'
+                                        }}
+                                    ></div>
+                                </div>
+                                <div className="chart-bar-count">{count}</div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        );
     };
 
     return (
@@ -286,6 +346,9 @@ const Deck = () => {
                                 </div>
                             </div>
                             
+                            {/* Gráfico de distribución de costes */}
+                            {renderCostChart(selectedDeck.cards)}
+                            
                             <div className="deck-cards-list-modal">
                                 <h3>Lista de Cartas ({selectedDeck.cards.length} cartas)</h3>
                                 <div className="cards-table">
@@ -295,7 +358,13 @@ const Deck = () => {
                                         <span>Tipo</span>
                                     </div>
                                     {selectedDeck.cards.map((card, index) => (
-                                        <div key={`${card.id}-${index}`} className="table-row">
+                                        <div 
+                                            key={`${card.id}-${index}`} 
+                                            className={`table-row ${isHeroCard(card) ? 'hero-row' : ''}`}
+                                            style={{
+                                                '--card-image': `url(${card.image})`
+                                            }}
+                                        >
                                             <span className="card-name">{card.name}</span>
                                             <span className="card-cost">{card.cost}</span>
                                             <span className="card-type">

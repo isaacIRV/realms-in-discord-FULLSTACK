@@ -353,7 +353,7 @@
 
 .cards-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 cartas por fila */
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
     max-height: 600px;
     overflow-y: auto;
@@ -395,6 +395,9 @@
     cursor: pointer;
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: auto;
 }
 
 .card-item::before {
@@ -435,14 +438,18 @@
 .card-image {
     width: 100%;
     height: 180px;
-    object-fit: cover;
+    object-fit: contain;
     border-radius: 8px;
     margin-bottom: 10px;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.3);
 }
 
 .card-info {
     font-size: 0.85em;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .card-name {
@@ -598,21 +605,76 @@
     color: #61dafb;
 }
 
+/* Estilos CORREGIDOS para las filas de cartas en el modal */
 .table-row {
+    --card-image: none;
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
     gap: 15px;
     padding: 12px 15px;
     border-bottom: 1px solid #444;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border-radius: 6px;
+    margin-bottom: 5px;
+    min-height: 60px;
+    align-items: center;
+}
+
+.table-row::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: var(--card-image);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.15;
+    z-index: 0;
+    border-radius: 6px;
+}
+
+.table-row > * {
+    position: relative;
+    z-index: 1;
 }
 
 .table-row:hover {
-    background: rgba(97, 218, 251, 0.1);
+    background: rgba(97, 218, 251, 0.2);
+    transform: translateX(5px);
 }
 
-.table-row:last-child {
-    border-bottom: none;
+.table-row:hover::before {
+    opacity: 0.25;
+}
+
+.table-row .card-name {
+    font-weight: bold;
+    color: #f5de0d;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.table-row .card-cost,
+.table-row .card-type {
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.table-row.hero-row {
+    border-left: 4px solid gold;
+    background: rgba(255, 215, 0, 0.1);
+}
+
+.table-row.hero-row::before {
+    opacity: 0.2;
+}
+
+.table-row.hero-row:hover {
+    background: rgba(255, 215, 0, 0.15);
 }
 
 .card-name {
@@ -685,10 +747,117 @@
     text-align: center;
 }
 
+
+.cost-chart {
+    background: linear-gradient(135deg, rgba(40, 44, 52, 0.8), rgba(30, 33, 40, 0.8));
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 25px;
+    border: 1px solid rgba(97, 218, 251, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.cost-chart h4 {
+    color: #61dafb;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.3em;
+    text-shadow: 0 0 5px rgba(97, 218, 251, 0.3);
+}
+
+.average-cost {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+    color: #f5de0d;
+    font-weight: bold;
+    background: rgba(245, 222, 13, 0.1);
+    padding: 10px;
+    border-radius: 6px;
+    border-left: 3px solid #f5de0d;
+}
+
+.chart-bars {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 120px;
+    gap: 8px;
+    padding: 0 10px;
+}
+
+.chart-bar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    max-width: 40px;
+    height: 100%;
+}
+
+.chart-bar-label {
+    color: #61dafb;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+.chart-bar {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px 4px 0 0;
+    height: 100%;
+    width: 25px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: flex-end;
+}
+
+.chart-bar-fill {
+    background: linear-gradient(0deg, #61dafb, #38b6d3);
+    width: 100%;
+    border-radius: 3px 3px 0 0;
+    transition: height 0.5s ease;
+    position: relative;
+    min-height: 3px; /* Altura mínima para que sea visible */
+}
+
+.chart-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(0deg, transparent, rgba(255, 255, 255, 0.3));
+    border-radius: 3px 3px 0 0;
+}
+
+.chart-bar-count {
+    color: #f5de0d;
+    font-weight: bold;
+    margin-top: 8px;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+.chart-bar-container:hover .chart-bar-fill {
+    background: linear-gradient(0deg, #f5de0d, #ffd700);
+    box-shadow: 0 0 10px rgba(245, 222, 13, 0.5);
+}
+
+.chart-bar-container:hover .chart-bar-label {
+    color: #f5de0d;
+    transform: scale(1.1);
+    transition: all 0.3s ease;
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
     .cards-grid {
-        grid-template-columns: repeat(3, 1fr); /* 3 cartas por fila en tablets grandes */
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
@@ -710,7 +879,7 @@
     }
     
     .cards-grid {
-        grid-template-columns: repeat(2, 1fr); /* 2 cartas por fila en móviles */
+        grid-template-columns: repeat(2, 1fr);
     }
     
     .saved-decks-grid {
@@ -734,14 +903,55 @@
     .load-deck-btn, .close-btn {
         min-width: 100%;
     }
+    
+    .cost-chart {
+        padding: 15px;
+    }
+    
+    .chart-bars {
+        height: 100px;
+        gap: 6px;
+    }
+    
+    .chart-bar {
+        width: 20px;
+    }
+    
+    .chart-bar-label,
+    .chart-bar-count {
+        font-size: 0.8em;
+    }
+    
+    .average-cost {
+        font-size: 1em;
+        padding: 8px;
+    }
 }
 
 @media (max-width: 480px) {
     .cards-grid {
-        grid-template-columns: 1fr; /* 1 carta por fila en móviles pequeños */
+        grid-template-columns: 1fr;
     }
     
     .deck-cards-list {
         grid-template-columns: 1fr;
+    }
+    
+    .chart-bars {
+        height: 80px;
+        gap: 4px;
+    }
+    
+    .chart-bar {
+        width: 18px;
+    }
+    
+    .chart-bar-label,
+    .chart-bar-count {
+        font-size: 0.75em;
+    }
+    
+    .cost-chart h4 {
+        font-size: 1.1em;
     }
 }
