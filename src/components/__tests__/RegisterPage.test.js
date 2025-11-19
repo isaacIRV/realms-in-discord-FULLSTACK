@@ -62,7 +62,7 @@ describe('Pruebas del Componente RegisterPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /Registrarse/i }));
     jest.advanceTimersByTime(1000); 
 
-    // 4. VERIFICACIÓN (ASSERTS)
+    // 4. VERIFICACIÓN (ASSETS)
     await waitFor(() => {
       
       // I. Verificación de Éxito
