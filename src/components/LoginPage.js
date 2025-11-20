@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Portada from '../background/Portada_R&D.png';
+import { apiService } from '../services/api';  // ← Importar el servicio
 
 function LoginPage({ onLoginSuccess }) {
     const [username, setUsername] = useState('');
@@ -12,27 +13,20 @@ function LoginPage({ onLoginSuccess }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Limpiamos los estados de error y carga
         setError("");
         setLoading(true);
 
         try {
-            // Simula una llamada a la API con tiempo de espera
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            
-            // Lógica de login
-            const users = JSON.parse(localStorage.getItem('users')) || {};
-            const user = users[username];
+            // LLAMADA REAL AL BACKEND
+            const response = await apiService.login({
+                username: username,
+                password: password
+            });
 
-            // Validacion del usuario y contraseña
-            if (user && user.password === password) {
-                onLoginSuccess(username);
-            } else {
-                setError('Usuario o contraseña incorrecta.');
-            }
+            onLoginSuccess(response.username);
+            
         } catch (err) {
-            // Manejo de errores de red
-            setError('Error de red. Por favor, intenta de nuevo.');
+            setError(err.message);
         } finally {
             setLoading(false);
         }

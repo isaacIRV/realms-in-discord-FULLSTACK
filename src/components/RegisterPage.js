@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import Portada from '../background/Portada_R&D.png';
+import { apiService } from '../services/api';  // ← Importar el servicio
 
 function RegisterPage({ onLoginSuccess }) {
     const [email, setEmail] = useState('');
@@ -13,39 +14,29 @@ function RegisterPage({ onLoginSuccess }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validacion en el cliente
         if (!username || !password || !email) {
             setError("Por favor, ingresa tu usuario, correo y contraseña.");
             return;
         }
 
         setError('');
-        setLoading(true); // Bloquea el formulario
+        setLoading(true);
 
-        // Logica de autenticacion (simulada)
         try {
-            // Simula una llamada a la API con tiempo de espera
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            // LLAMADA REAL AL BACKEND
+            await apiService.register({
+                username: username,
+                email: email,
+                password: password
+            });
 
-            // Logica de registro
-            const users = JSON.parse(localStorage.getItem('users')) || {};
-
-            if (users[username]) {
-                setError("El usuario ya existe. Por favor elige otro.");
-            } else if (Object.values(users).some(user => user.email === email)) {
-                setError("El correo ya esta en uso. Por favor elige otro.");
-            } else {
-                // Guarda el nuevo usuario
-                users[username] = { email, password };
-                localStorage.setItem('users', JSON.stringify(users));
-                alert("Registro exitoso! Ahora puedes ingresar.");
-                onLoginSuccess(username); // Loguea automaticamente despues de registrar
-            }
+            alert("Registro exitoso! Ahora puedes ingresar.");
+            onLoginSuccess(username);
+            
         } catch (err) {
-            // Manejo de errores de red
-            setError("Error de red. Por favor intenta de nuevo.");
+            setError(err.message);
         } finally {
-            setLoading(false); // Desbloquea el formulario
+            setLoading(false);
         }
     };
 
