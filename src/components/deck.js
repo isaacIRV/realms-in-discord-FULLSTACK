@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { cards } from '../data/cards';
 import '../styles/deck.css';
 
-const Deck = () => {
+const Deck = ({ currentUser }) => {
     const [deck, setDeck] = useState([]);
     const [availableCards, setAvailableCards] = useState([]);
     const [heroCard, setHeroCard] = useState(null);
@@ -11,18 +11,55 @@ const Deck = () => {
     const [savedDecks, setSavedDecks] = useState([]);
     const [selectedDeck, setSelectedDeck] = useState(null);
     const [showDeckModal, setShowDeckModal] = useState(false);
+    const [loading, setLoading] = useState(false);
     const DECK_MAX_SIZE = 22;
 
     // Cargar mazos guardados al inicializar
     useEffect(() => {
         loadSavedDecks();
         setAvailableCards(cards);
-    }, []);
+    }, [currentUser]);
 
-    // Cargar mazos guardados desde localStorage
-    const loadSavedDecks = () => {
-        const decks = JSON.parse(localStorage.getItem('savedDecks')) || [];
-        setSavedDecks(decks);
+    // Cargar mazos guardados desde MONGODB
+    const loadSavedDecks = async () => {
+        if (!currentUser) {
+            // Fallback a localStorage si no hay usuario
+            const decks = JSON.parse(localStorage.getItem('savedDecks')) || [];
+            setSavedDecks(decks);
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(`http://localhost:8081/api/decks/user/${currentUser}`);
+            
+            if (!response.ok) {
+                throw new Error('Error al cargar mazos');
+            }
+            
+            const decksFromAPI = await response.json();
+            
+            // Convertir los mazos de la API al formato que espera tu UI
+            const convertedDecks = decksFromAPI.map(apiDeck => ({
+                id: apiDeck.id,
+                name: apiDeck.deckName,
+                cards: apiDeck.cards.map(cardId => availableCards.find(card => card.id === cardId)).filter(card => card),
+                hero: availableCards.find(card => card.id === apiDeck.cards.find(cardId => {
+                    const card = availableCards.find(c => c.id === cardId);
+                    return card && (card.name.toLowerCase().includes('heroe') || card.name.toLowerCase().includes('héroe'));
+                })),
+                createdAt: apiDeck.createdAt
+            })).filter(deck => deck.cards.length > 0); // Filtrar mazos con cartas válidas
+            
+            setSavedDecks(convertedDecks);
+        } catch (err) {
+            console.error('Error cargando mazos:', err);
+            // Fallback a localStorage
+            const decks = JSON.parse(localStorage.getItem('savedDecks')) || [];
+            setSavedDecks(decks);
+        } finally {
+            setLoading(false);
+        }
     };
 
     // Contar cuántas copias de una carta hay en el mazo
@@ -105,8 +142,8 @@ const Deck = () => {
         setError('');
     };
 
-    // Guardar el mazo
-    const saveDeck = () => {
+    // Guardar el mazo EN MONGODB
+    const saveDeck = async () => {
         if (deck.length !== DECK_MAX_SIZE) {
             setError(`Tu mazo debe tener exactamente ${DECK_MAX_SIZE} cartas. Actualmente tienes ${deck.length}.`);
             return;
@@ -120,21 +157,74 @@ const Deck = () => {
         const deckName = prompt('Ingresa un nombre para tu mazo:', `Mazo ${savedDecks.length + 1}`);
         if (!deckName) return;
 
-        const currentSavedDecks = JSON.parse(localStorage.getItem('savedDecks')) || [];
-        const newDeck = {
-            id: Date.now(),
-            name: deckName,
-            cards: [...deck],
-            hero: heroCard,
-            createdAt: new Date().toISOString()
-        };
-        
-        const updatedDecks = [...currentSavedDecks, newDeck];
-        localStorage.setItem('savedDecks', JSON.stringify(updatedDecks));
-        
-        alert('¡Mazo guardado exitosamente!');
-        setError('');
-        loadSavedDecks();
+        try {
+            setLoading(true);
+            
+            // Convertir el mazo a IDs para MongoDB
+            const cardIds = deck.map(card => card.id);
+            
+            // Guardar en MongoDB
+            const response = await fetch('http://localhost:8081/api/decks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'userId': currentUser
+                },
+                body: JSON.stringify({
+                    userId: currentUser,
+                    deckName: deckName,
+                    cards: cardIds
+                }),
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Error al guardar mazo');
+            }
+            
+            const newDeckFromAPI = await response.json();
+            
+            // Crear objeto para la UI local
+            const newDeckForUI = {
+                id: newDeckFromAPI.id,
+                name: newDeckFromAPI.deckName,
+                cards: deck, // Mantener objetos completos localmente
+                hero: heroCard,
+                createdAt: newDeckFromAPI.createdAt
+            };
+            
+            // Actualizar estado local
+            setSavedDecks([...savedDecks, newDeckForUI]);
+            
+            // También guardar en localStorage como backup
+            const currentLocalDecks = JSON.parse(localStorage.getItem('savedDecks')) || [];
+            localStorage.setItem('savedDecks', JSON.stringify([...currentLocalDecks, newDeckForUI]));
+            
+            alert('¡Mazo guardado exitosamente en la nube!');
+            setError('');
+            
+        } catch (err) {
+            console.error('Error guardando en MongoDB:', err);
+            
+            // FALLBACK: Guardar solo en localStorage
+            const currentSavedDecks = JSON.parse(localStorage.getItem('savedDecks')) || [];
+            const newDeck = {
+                id: Date.now(),
+                name: deckName,
+                cards: [...deck],
+                hero: heroCard,
+                createdAt: new Date().toISOString()
+            };
+            
+            const updatedDecks = [...currentSavedDecks, newDeck];
+            localStorage.setItem('savedDecks', JSON.stringify(updatedDecks));
+            setSavedDecks(updatedDecks);
+            
+            alert('¡Mazo guardado localmente! (Error de conexión con la nube)');
+            setError('');
+        } finally {
+            setLoading(false);
+        }
     };
 
     // Mostrar detalles de un mazo guardado
@@ -143,13 +233,39 @@ const Deck = () => {
         setShowDeckModal(true);
     };
 
-    // Eliminar un mazo guardado
-    const deleteDeck = (deckId, event) => {
+    // Eliminar un mazo guardado DE MONGODB
+    const deleteDeck = async (deckId, event) => {
         event.stopPropagation();
-        if (window.confirm('¿Estás seguro de que quieres eliminar este mazo?')) {
+        if (!window.confirm('¿Estás seguro de que quieres eliminar este mazo?')) return;
+
+        try {
+            // Eliminar de MongoDB
+            if (currentUser) {
+                const response = await fetch(`http://localhost:8081/api/decks/${deckId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'userId': currentUser
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Error al eliminar mazo de la nube');
+                }
+            }
+            
+            // Eliminar localmente
             const updatedDecks = savedDecks.filter(deck => deck.id !== deckId);
-            localStorage.setItem('savedDecks', JSON.stringify(updatedDecks));
             setSavedDecks(updatedDecks);
+            
+            // Actualizar localStorage
+            localStorage.setItem('savedDecks', JSON.stringify(updatedDecks));
+            
+        } catch (err) {
+            console.error('Error eliminando mazo:', err);
+            // Solo eliminar localmente si falla la API
+            const updatedDecks = savedDecks.filter(deck => deck.id !== deckId);
+            setSavedDecks(updatedDecks);
+            localStorage.setItem('savedDecks', JSON.stringify(updatedDecks));
         }
     };
 
@@ -214,7 +330,7 @@ const Deck = () => {
     return (
         <div className="deck-builder-container">
             <h1>Constructor de Mazos (Deck Builder)</h1>
-            <p>Aquí diseñarás tu estrategia.</p>
+            <p>Usuario: {currentUser} | Mazos guardados en la nube ✅</p>
             
             {/* Información del mazo actual */}
             <div className="deck-info">
@@ -226,9 +342,9 @@ const Deck = () => {
                         <button 
                             className="save-btn" 
                             onClick={saveDeck}
-                            disabled={deck.length !== DECK_MAX_SIZE || !heroCard}
+                            disabled={deck.length !== DECK_MAX_SIZE || !heroCard || loading}
                         >
-                            Guardar Mazo
+                            {loading ? 'Guardando...' : 'Guardar Mazo (Nube)'}
                         </button>
                         <button className="clear-btn" onClick={clearDeck}>
                             Limpiar Mazo
@@ -237,6 +353,7 @@ const Deck = () => {
                 </div>
                 
                 {error && <p className="error-message">{error}</p>}
+                {loading && <p className="loading-message">Conectando con la nube...</p>}
                 
                 {/* Lista de cartas en el mazo */}
                 <div className="deck-cards">
