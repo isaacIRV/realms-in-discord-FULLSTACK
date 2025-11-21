@@ -1,9 +1,17 @@
+// Detectar si estamos en desarrollo o producción
+const getApiBaseUrl = () => {
+  const hostname = window.location.hostname;
+  
+  // Si estamos en desarrollo local
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:8080/api';
+  }
+  
+  // Si estamos en S3 (producción) - conectar a EC2
+  return 'http://44.221.43.22:8080/api';
+};
 
-const isDevelopment = process.env.NODE_ENV === 'development';
-
-const API_BASE_URL = isDevelopment 
-  ? 'http://localhost:8080/api'  
-  : 'http://TU-EC2-IP:8080/api'; 
+const API_BASE_URL = getApiBaseUrl();
 
 export const apiService = {
     async login(credentials) {
@@ -65,7 +73,6 @@ export const apiService = {
         }
     },
 
-    // NUEVA FUNCIÓN PARA ACTUALIZAR USUARIO
     async updateUser(username, userData) {
         try {
             const response = await fetch(`${API_BASE_URL}/users/${username}`, {
@@ -84,6 +91,83 @@ export const apiService = {
             return await response.json();
         } catch (error) {
             console.error('Error actualizando usuario:', error);
+            throw error;
+        }
+    },
+
+    async getUserDecks(userId) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/decks/user/${userId}`);
+            
+            if (!response.ok) {
+                throw new Error('Error al obtener mazos');
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error obteniendo mazos:', error);
+            throw error;
+        }
+    },
+
+    async createDeck(deckData) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/decks`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(deckData),
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Error al crear mazo');
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error creando mazo:', error);
+            throw error;
+        }
+    },
+
+    async updateDeck(deckId, userId, deckData) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/decks/${deckId}?userId=${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(deckData),
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Error al actualizar mazo');
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error actualizando mazo:', error);
+            throw error;
+        }
+    },
+
+    async deleteDeck(deckId, userId) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/decks/${deckId}?userId=${userId}`, {
+                method: 'DELETE',
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Error al eliminar mazo');
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error eliminando mazo:', error);
             throw error;
         }
     }
