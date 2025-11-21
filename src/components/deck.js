@@ -330,7 +330,7 @@ const Deck = ({ currentUser }) => {
     return (
         <div className="deck-builder-container">
             <h1>Constructor de Mazos (Deck Builder)</h1>
-            <p>Usuario: {currentUser} | Mazos guardados en la nube ✅</p>
+            <p>Usuario: {currentUser}</p>
             
             {/* Información del mazo actual */}
             <div className="deck-info">
