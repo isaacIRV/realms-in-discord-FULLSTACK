@@ -1,4 +1,3 @@
-// App.js - Versión corregida y simplificada
 
 import './styles/index.css';
 import './styles/App.css';
