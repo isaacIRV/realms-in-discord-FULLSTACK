@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/Navbar_style.css'; 
+import { apiService } from '../services/api'; // ← AGREGAR IMPORT
 
 const Navbar = ({currentUser, onLogout, onUsernameChange, gold = 0, onGoldUpdate}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -8,6 +9,7 @@ const Navbar = ({currentUser, onLogout, onUsernameChange, gold = 0, onGoldUpdate
   const [newUsername, setNewUsername] = useState(currentUser || '');
   const [usernameError, setUsernameError] = useState('');
   const [activeTab, setActiveTab] = useState('profile'); // 'profile' o 'history'
+  const [isUpdating, setIsUpdating] = useState(false); // ← NUEVO ESTADO
 
   // Datos de ejemplo para el historial de partidas
   const matchHistory = [
@@ -82,6 +84,7 @@ const Navbar = ({currentUser, onLogout, onUsernameChange, gold = 0, onGoldUpdate
     setUsernameError('');
     setNewUsername(currentUser || '');
     setActiveTab('profile');
+    setIsUpdating(false); // ← RESETEAR ESTADO
   };
 
   const handleLogout = () => {
@@ -93,7 +96,8 @@ const Navbar = ({currentUser, onLogout, onUsernameChange, gold = 0, onGoldUpdate
     setIsEditingUsername(true);
   };
 
-  const handleSaveUsername = () => {
+  // FUNCIÓN ACTUALIZADA PARA GUARDAR USERNAME
+  const handleSaveUsername = async () => {
     if (!newUsername.trim()) {
       setUsernameError('El nombre de usuario no puede estar vacío');
       return;
@@ -109,24 +113,28 @@ const Navbar = ({currentUser, onLogout, onUsernameChange, gold = 0, onGoldUpdate
       return;
     }
 
-    const users = JSON.parse(localStorage.getItem('users')) || {};
-    if (users[newUsername] && newUsername !== currentUser) {
-      setUsernameError('Este nombre de usuario ya está en uso');
-      return;
-    }
-
-    if (onUsernameChange) {
-      onUsernameChange(newUsername.trim());
-    }
-
-    setIsEditingUsername(false);
+    setIsUpdating(true);
     setUsernameError('');
+
+    try {
+      // Llamar a la función del padre que se comunica con el backend
+      await onUsernameChange(newUsername.trim());
+
+      setIsEditingUsername(false);
+      setUsernameError('');
+      
+    } catch (error) {
+      setUsernameError(error.message);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleCancelEdit = () => {
     setIsEditingUsername(false);
     setNewUsername(currentUser || '');
     setUsernameError('');
+    setIsUpdating(false);
   };
 
   const handleUsernameChange = (e) => {
@@ -235,6 +243,7 @@ const Navbar = ({currentUser, onLogout, onUsernameChange, gold = 0, onGoldUpdate
                           placeholder="Nuevo nombre de usuario"
                           maxLength={20}
                           autoFocus
+                          disabled={isUpdating}
                         />
                         {usernameError && (
                           <p className="username-error">{usernameError}</p>
@@ -243,12 +252,14 @@ const Navbar = ({currentUser, onLogout, onUsernameChange, gold = 0, onGoldUpdate
                           <button 
                             className="modal-btn primary save-username-btn"
                             onClick={handleSaveUsername}
+                            disabled={isUpdating}
                           >
-                            Guardar
+                            {isUpdating ? 'Guardando...' : 'Guardar'}
                           </button>
                           <button 
                             className="modal-btn secondary"
                             onClick={handleCancelEdit}
+                            disabled={isUpdating}
                           >
                             Cancelar
                           </button>
