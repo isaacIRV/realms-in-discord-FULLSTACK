@@ -1,4 +1,3 @@
-// App.js - Versión corregida y simplificada
 
 import './styles/index.css';
 import './styles/App.css';
@@ -10,6 +9,7 @@ import Home from './components/home';
 import Library from './components/library';
 import Deck from './components/deck';
 import Play from './components/play';
+import { apiService } from './services/api';  // ← AGREGAR IMPORT
 
 function App() {
   
@@ -26,22 +26,35 @@ function App() {
   };
 
   // Nueva función para manejar el cambio de nombre de usuario
-  const handleUsernameChange = (newUsername) => {
-    // Actualizar localStorage
-    const users = JSON.parse(localStorage.getItem('users')) || {};
-    const userData = users[currentUser];
-    
-    if (userData) {
-      // Eliminar el usuario antiguo y crear el nuevo
-      delete users[currentUser];
-      users[newUsername] = userData;
-      localStorage.setItem('users', JSON.stringify(users));
+  const handleUsernameChange = async (newUsername) => {
+    try {
+      // Llamar al backend para actualizar el username
+      await apiService.updateUser(currentUser, {
+        username: newUsername
+      });
+
+      // Actualizar localStorage
+      const users = JSON.parse(localStorage.getItem('users')) || {};
+      const userData = users[currentUser];
       
-      // Actualizar el usuario actual en localStorage
-      localStorage.setItem('currentUser', newUsername);
+      if (userData) {
+        // Eliminar el usuario antiguo y crear el nuevo
+        delete users[currentUser];
+        users[newUsername] = userData;
+        localStorage.setItem('users', JSON.stringify(users));
+        
+        // Actualizar el usuario actual en localStorage
+        localStorage.setItem('currentUser', newUsername);
+        
+        // Actualizar estado
+        setCurrentUser(newUsername);
+      }
       
-      // Actualizar estado
-      setCurrentUser(newUsername);
+      console.log('Username actualizado exitosamente');
+      
+    } catch (error) {
+      console.error('Error actualizando username:', error);
+      throw error; // Propagar el error para manejarlo en el Navbar
     }
   };
 

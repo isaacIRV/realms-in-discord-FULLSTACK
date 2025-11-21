@@ -1,9 +1,9 @@
-// Detectar si estamos en desarrollo o producción
+
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 const API_BASE_URL = isDevelopment 
-  ? 'http://localhost:8080/api'  // Desarrollo
-  : 'http://TU-EC2-IP:8080/api'; // Producción ← CAMBIAR POR TU IP REAL
+  ? 'http://localhost:8080/api'  
+  : 'http://TU-EC2-IP:8080/api'; 
 
 export const apiService = {
     async login(credentials) {
@@ -61,6 +61,29 @@ export const apiService = {
             return await response.json();
         } catch (error) {
             console.error('Error obteniendo perfil:', error);
+            throw error;
+        }
+    },
+
+    // NUEVA FUNCIÓN PARA ACTUALIZAR USUARIO
+    async updateUser(username, userData) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${username}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData),
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Error al actualizar usuario');
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error actualizando usuario:', error);
             throw error;
         }
     }
