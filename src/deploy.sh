@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # CONFIGURACIÓN
-EC2_IP="3.230.148.166"
+EC2_IP="98.95.11.209"
 S3_BUCKET="s3-realmsindiscord-react-fullstack"
-KEY_FILE="llave-microservicios-ec2.pem"
+KEY_FILE="realms-key.pem"
 
 echo "🚀 INICIANDO DESPLIEGUE COMPLETO A AWS..."
 echo "📁 Usando key: $KEY_FILE"
@@ -160,8 +160,8 @@ echo "🌐 FRONTEND (S3):"
 echo "   http://s3-realmsindiscord-react-fullstack.s3-website-us-east-1.amazonaws.com"
 echo ""
 echo "🔧 BACKEND (EC2):"
-echo "   Users API: http://3.230.148.166:8080"
-echo "   Decks API: http://3.230.148.166:8081"
+echo "   Users API: http://98.95.11.209:8080"
+echo "   Decks API: http://98.95.11.209:8081"
 echo ""
 echo "📝 COMANDOS ÚTILES:"
 echo "   Ver logs: ssh -i $KEY_FILE ec2-user@$EC2_IP 'tail -f /home/ec2-user/logs/*.log'"

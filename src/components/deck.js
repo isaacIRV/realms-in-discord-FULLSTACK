@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { cards } from '../data/cards';
+import { deckService } from '../services/deckService';
 import '../styles/deck.css';
 
 const Deck = ({ currentUser }) => {
@@ -31,13 +32,7 @@ const Deck = ({ currentUser }) => {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:8081/api/decks/user/${currentUser}`);
-            
-            if (!response.ok) {
-                throw new Error('Error al cargar mazos');
-            }
-            
-            const decksFromAPI = await response.json();
+            const decksFromAPI = await deckService.getUserDecks(currentUser);
             
             // Convertir los mazos de la API al formato que espera tu UI
             const convertedDecks = decksFromAPI.map(apiDeck => ({
@@ -163,26 +158,11 @@ const Deck = ({ currentUser }) => {
             // Convertir el mazo a IDs para MongoDB
             const cardIds = deck.map(card => card.id);
             
-            // Guardar en MongoDB
-            const response = await fetch('http://localhost:8081/api/decks', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'userId': currentUser
-                },
-                body: JSON.stringify({
-                    userId: currentUser,
-                    deckName: deckName,
-                    cards: cardIds
-                }),
+            const newDeckFromAPI = await deckService.createDeck({
+                userId: currentUser,
+                deckName: deckName,
+                cards: cardIds
             });
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al guardar mazo');
-            }
-            
-            const newDeckFromAPI = await response.json();
             
             // Crear objeto para la UI local
             const newDeckForUI = {
@@ -239,18 +219,9 @@ const Deck = ({ currentUser }) => {
         if (!window.confirm('¿Estás seguro de que quieres eliminar este mazo?')) return;
 
         try {
-            // Eliminar de MongoDB
+           
             if (currentUser) {
-                const response = await fetch(`http://localhost:8081/api/decks/${deckId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'userId': currentUser
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Error al eliminar mazo de la nube');
-                }
+                await deckService.deleteDeck(deckId, currentUser);
             }
             
             // Eliminar localmente

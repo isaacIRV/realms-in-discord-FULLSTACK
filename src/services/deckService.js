@@ -8,7 +8,7 @@ const getDeckApiBaseUrl = () => {
   }
   
   // Si estamos en S3 (producción) - conectar a EC2
-  return 'http://3.230.148.166:8081/api/decks';  // ← NUEVA IP
+  return 'http://98.95.11.209:8081/api/decks';  // ← NUEVA IP
 };
 
 const DECK_API_BASE_URL = getDeckApiBaseUrl();
