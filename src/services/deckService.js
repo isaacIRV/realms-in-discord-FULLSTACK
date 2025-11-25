@@ -1,6 +1,17 @@
 // src/services/deckService.js
+const getDeckApiBaseUrl = () => {
+  const hostname = window.location.hostname;
+  
+  // Si estamos en desarrollo local
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:8081/api/decks';
+  }
+  
+  // Si estamos en S3 (producción) - conectar a EC2
+  return 'http://3.230.148.166:8081/api/decks';  // ← NUEVA IP
+};
 
-const DECK_API_BASE_URL = 'http://localhost:8081/api/decks';
+const DECK_API_BASE_URL = getDeckApiBaseUrl();
 
 export const deckService = {
     // Obtener todos los mazos de un usuario
