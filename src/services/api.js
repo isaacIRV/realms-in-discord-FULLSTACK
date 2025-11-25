@@ -8,7 +8,7 @@ const getApiBaseUrl = () => {
   }
   
   // Si estamos en S3 (producción) - conectar a EC2
-  return 'http://44.221.43.22:8080/api';
+  return 'http://98.95.11.209:8080/api';
 };
 
 const API_BASE_URL = getApiBaseUrl();
